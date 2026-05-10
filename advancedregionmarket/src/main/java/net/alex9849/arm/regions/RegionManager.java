@@ -76,6 +76,10 @@ public class RegionManager extends YamlFileManager<Region> {
         if (super.add(region, unsafe)) {
             this.addToWorldChunkMap(region);
             this.updateScheduler.rearrangeUpdateQuenue();
+            // Force an immediate save so payedTill is written to disk before
+            // any scheduler tick runs. Without this, a race on MC 1.21.x can
+            // cause payedTill=0, making the region appear expired on restart.
+            this.saveFile();
             return true;
         }
         return false;
